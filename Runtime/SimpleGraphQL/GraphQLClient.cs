@@ -55,13 +55,15 @@ namespace SimpleGraphQL
         /// <param name="headers">Any headers you want to pass</param>
         /// <param name="authToken">The authToken</param>
         /// <param name="authScheme">The authScheme to be used.</param>
+        /// <param name="onResponseHeadersReceived">A callback that will be called when the response headers are received.</param>
         /// <returns></returns>
         public async Task<string> Send(
             Request request,
             JsonSerializerSettings serializerSettings = null,
             Dictionary<string, string> headers = null,
             string authToken = null,
-            string authScheme = null
+            string authScheme = null,
+            Action<Dictionary<string, string>> onResponseHeadersReceived = null
         )
         {
             if (CustomHeaders != null)
@@ -85,7 +87,8 @@ namespace SimpleGraphQL
                 serializerSettings,
                 headers,
                 authToken,
-                authScheme
+                authScheme,
+                onResponseHeadersReceived
             );
 
             return postQueryAsync;
@@ -96,10 +99,11 @@ namespace SimpleGraphQL
             JsonSerializerSettings serializerSettings = null,
             Dictionary<string, string> headers = null,
             string authToken = null,
-            string authScheme = null
+            string authScheme = null,
+            Action<Dictionary<string, string>> onResponseHeadersReceived = null
         )
         {
-            string json = await Send(request, serializerSettings, headers, authToken, authScheme);
+            string json = await Send(request, serializerSettings, headers, authToken, authScheme, onResponseHeadersReceived);
             return JsonConvert.DeserializeObject<Response<TResponse>>(json);
         }
 
@@ -109,9 +113,11 @@ namespace SimpleGraphQL
             JsonSerializerSettings serializerSettings = null,
             Dictionary<string, string> headers = null,
             string authToken = null,
-            string authScheme = null)
+            string authScheme = null,
+            Action<Dictionary<string, string>> onResponseHeadersReceived = null
+        )
         {
-            return await Send<TResponse>(request, serializerSettings, headers, authToken, authScheme);
+            return await Send<TResponse>(request, serializerSettings, headers, authToken, authScheme, onResponseHeadersReceived);
         }
 
         /// <summary>

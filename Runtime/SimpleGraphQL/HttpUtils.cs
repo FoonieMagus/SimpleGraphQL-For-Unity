@@ -50,6 +50,7 @@ namespace SimpleGraphQL
         /// <param name="authToken">The actual auth token.</param>
         /// <param name="serializerSettings"></param>
         /// <param name="headers">Any headers that should be passed in</param>
+        /// <param name="onResponseHeadersReceived">Called when the response headers are received</param>
         /// <returns></returns>
         public static async Task<string> PostRequest(
             string url,
@@ -57,7 +58,8 @@ namespace SimpleGraphQL
             JsonSerializerSettings serializerSettings = null,
             Dictionary<string, string> headers = null,
             string authToken = null,
-            string authScheme = null
+            string authScheme = null,
+            Action<Dictionary<string, string>> onResponseHeadersReceived = null
         )
         {
             var uri = new Uri(url);
@@ -112,6 +114,8 @@ namespace SimpleGraphQL
                     throw new UnityWebRequestException(webRequest);
                 }
 #endif
+
+                onResponseHeadersReceived?.Invoke(webRequest.GetResponseHeaders());
 
                 return webRequest.downloadHandler.text;
             }
